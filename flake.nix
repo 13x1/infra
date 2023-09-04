@@ -12,6 +12,8 @@
         packages.${system} = {
 
         } //
-          util.mapHostAttrs (h: "btrfs_setup_${h}") (h: import ./hosts/${h}/btrfs_setup.nix { inherit pkgs; });
+          util.mapHostAttrs
+            (host: "btrfs_setup_${host}")
+            (host: import ./hosts/${host}/btrfs_setup.nix { inherit pkgs; });
     };
 }
