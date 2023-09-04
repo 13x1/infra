@@ -14,6 +14,6 @@
         } //
           util.mapHostAttrs
             (host: "btrfs_setup_${host}")
-            (host: import ./hosts/${host}/btrfs_setup.nix { inherit pkgs; });
+            (host: import ./btrfs_setup.nix { inherit pkgs util host; part = import ./hosts/${host}/partitions.nix; });
     };
 }
