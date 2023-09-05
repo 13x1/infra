@@ -21,6 +21,8 @@ in pkgs.writeShellApplication {
             usage: fs_cli <host> <command>
             commands:
               show: prints the setup script
+              show_config: prints the config result in a pretty format
+              show_src: prints the nix source of the config file
               apply: runs the setup script
             "
             exit 1
@@ -30,6 +32,14 @@ in pkgs.writeShellApplication {
             cat "$(which "btrfs_setup_$host")"
         elif [ "$command" = "apply" ]; then
             eval "$(which "btrfs_setup_$host")"
+        elif [ "$command" = "show_config" ]; then
+            if [ ! -f /tmp/alejandra ]; then
+                curl -L https://github.com/kamadorueda/alejandra/releases/download/3.0.0/alejandra-x86_64-unknown-linux-musl > /tmp/alejandra
+                chmod +x /tmp/alejandra
+            fi
+            nix eval -f "./hosts/$host/fs.nix" | /tmp/alejandra --quiet
+        elif [ "$command" = "show_src" ]; then
+            cat "./hosts/$host/fs.nix"
         else
             echo "unknown command $command"
             exit 1
