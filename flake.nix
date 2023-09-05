@@ -1,16 +1,16 @@
 {
+    description = "Nix configuration for my infra";
     inputs = {
-        nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
-        nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+        nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+        flake-utils.url = "github:numtide/flake-utils";
     };
 
-    outputs = {self, nixpkgs, nixpkgs-unstable}@inputs: let
-        system = "x86_64-linux";
-        util = import ./util.nix;
-        pkgs = import nixpkgs-unstable {inherit system; overlays = [util]; };
+    outputs = {self, nixpkgs, flake-utils}: flake-utils.lib.eachDefaultSystem(system: let
+        util = (import ./overlays/util.nix 0 0).util;
+        pkgs = import nixpkgs {inherit system; overlays = util.nixFilesIn ./overlays; };
     in {
-        packages.${system} = {
+        packages = {
             fs_cli = pkgs.callPackage ./fs/cli.nix {};
         };
-    };
+    });
 }
