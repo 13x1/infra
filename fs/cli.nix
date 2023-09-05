@@ -4,7 +4,7 @@ let
     allHosts = util.mapHosts (f: f);
     managedHosts = builtins.filter (h: (builtins.readDir ../hosts/${h}) ? "fs.nix") allHosts;
     hostApps = map (host: pkgs.callPackage ./btrfs_setup.nix {
-        inherit host util;
+        inherit host;
         fs = import ../hosts/${host}/fs.nix;
     }) managedHosts;
 in pkgs.writeShellApplication {
