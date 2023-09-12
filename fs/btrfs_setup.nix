@@ -27,7 +27,12 @@ in pkgs.writeShellApplication {
                 : "Do you want to proceed? Existing subvolumes will be re-used."
                 : "This might cause trouble if they're not compatible with the new config."
                 read -p "[y/N] " -r
-                if [[ ! $REPLY =~ ^[Yy]$ ]]; then umount $MNT; exit 1; fi
+                if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                    umount $MNT;
+                    rm -d $MNT;
+                    rm -d /setup;
+                    exit 1;
+                fi
             fi
             : "Creating subvolumes..."
             ${join "" (util.mapKeys subvols (sub: ''
@@ -43,12 +48,16 @@ in pkgs.writeShellApplication {
                     mount -o "subvol=${sub.name},noatime,compress=${sub.compress}" ${dev.path} "$ROOT${mount}"
                 ''))}
             ''))}
+            : "Cleaning up..."
             umount $MNT
+            rm -d $MNT
             : "Mounting additional paths..."
             ${join "" (util.mapKeys dev.mounts or [] (mount: ''
                 mkdir -p "$ROOT${mount}"
                 mount ${dev.path} "$ROOT${mount}"
             ''))}
         ''))}
+        : "Cleaning up..."
+        rm -d /setup
     '';
 }

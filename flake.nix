@@ -5,7 +5,7 @@
         flake-utils.url = "github:numtide/flake-utils";
     };
 
-    outputs = {self, nixpkgs, flake-utils}: flake-utils.lib.eachDefaultSystem(system: let
+    outputs = {self, nixpkgs, flake-utils}: flake-utils.lib.eachSystem [ "x86_64-linux" ] (system: let
         util = (import ./overlays/util.nix 0 0).util;
         pkgs = import nixpkgs {inherit system; overlays = util.nixFilesIn ./overlays; };
     in {
